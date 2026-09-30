@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.gitignore
+*.log
+*.png
+*.pptx
+*.pdf
+.venv*
+docs/rendered

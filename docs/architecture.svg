@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Arquitetura do Kubernetes Incident Mystery</title>
+  <desc id="desc">Fluxo do código TypeScript através de testes e build Vite até opções de publicação em static hosting, contêiner Nginx ou Kubernetes, consumidas por um navegador sem backend.</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#1e293b" stroke-width=".6"/></pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0 10 4 0 8Z" fill="#64748b"/></marker>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="720" fill="#020617"/><rect width="1200" height="720" fill="url(#grid)"/>
+  <text x="50" y="55" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700">Kubernetes Incident Mystery</text>
+  <text x="50" y="82" fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="12">Arquitetura estática, portátil e sem backend</text>
+
+  <!-- arrows behind components -->
+  <path d="M220 195H330" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M500 195H610" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M780 195H860V295" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M780 195H980V295" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M780 195H1090V295" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M980 385V500H830" stroke="#22d3ee" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M1090 385V500H830" stroke="#22d3ee" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M700 545H500" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g font-family="JetBrains Mono, monospace">
+    <rect x="50" y="145" width="170" height="100" rx="10" fill="#0f172a"/><rect x="50" y="145" width="170" height="100" rx="10" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="2"/>
+    <text x="135" y="180" fill="#fff" text-anchor="middle" font-size="14" font-weight="700">Código-fonte</text><text x="135" y="205" fill="#94a3b8" text-anchor="middle" font-size="11">HTML + CSS + TS</text><text x="135" y="225" fill="#22d3ee" text-anchor="middle" font-size="10">simulador + casos</text>
+
+    <rect x="330" y="145" width="170" height="100" rx="10" fill="#0f172a"/><rect x="330" y="145" width="170" height="100" rx="10" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="2"/>
+    <text x="415" y="177" fill="#fff" text-anchor="middle" font-size="14" font-weight="700">Quality Gate</text><text x="415" y="202" fill="#94a3b8" text-anchor="middle" font-size="11">Vitest + TypeScript</text><text x="415" y="224" fill="#34d399" text-anchor="middle" font-size="10">Playwright E2E</text>
+
+    <rect x="610" y="145" width="170" height="100" rx="10" fill="#0f172a"/><rect x="610" y="145" width="170" height="100" rx="10" fill="rgba(120,53,15,.3)" stroke="#fbbf24" stroke-width="2"/>
+    <text x="695" y="177" fill="#fff" text-anchor="middle" font-size="14" font-weight="700">Vite Build</text><text x="695" y="202" fill="#94a3b8" text-anchor="middle" font-size="11">npm run build</text><text x="695" y="224" fill="#fbbf24" text-anchor="middle" font-size="10">dist/ versionado</text>
+
+    <rect x="800" y="285" width="175" height="100" rx="10" fill="#0f172a"/><rect x="800" y="285" width="175" height="100" rx="10" fill="rgba(120,53,15,.3)" stroke="#fbbf24" stroke-width="2"/>
+    <text x="887" y="318" fill="#fff" text-anchor="middle" font-size="13" font-weight="700">Static Hosting</text><text x="887" y="342" fill="#94a3b8" text-anchor="middle" font-size="10">CDN / Object Storage</text><text x="887" y="364" fill="#fbbf24" text-anchor="middle" font-size="9">S3, SWA, Pages, GCS</text>
+
+    <rect x="990" y="285" width="160" height="100" rx="10" fill="#0f172a"/><rect x="990" y="285" width="160" height="100" rx="10" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="2"/>
+    <text x="1070" y="318" fill="#fff" text-anchor="middle" font-size="13" font-weight="700">Nginx Container</text><text x="1070" y="342" fill="#94a3b8" text-anchor="middle" font-size="10">porta 8080</text><text x="1070" y="364" fill="#34d399" text-anchor="middle" font-size="9">/healthz</text>
+
+    <rect x="700" y="495" width="130" height="100" rx="10" fill="#0f172a"/><rect x="700" y="495" width="130" height="100" rx="10" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="2"/>
+    <text x="765" y="530" fill="#fff" text-anchor="middle" font-size="14" font-weight="700">Browser</text><text x="765" y="554" fill="#94a3b8" text-anchor="middle" font-size="10">HTML/CSS/JS</text><text x="765" y="576" fill="#22d3ee" text-anchor="middle" font-size="9">localStorage</text>
+
+    <rect x="330" y="495" width="170" height="100" rx="10" fill="#0f172a"/><rect x="330" y="495" width="170" height="100" rx="10" fill="rgba(76,29,149,.4)" stroke="#a78bfa" stroke-width="2"/>
+    <text x="415" y="530" fill="#fff" text-anchor="middle" font-size="14" font-weight="700">Game Engine</text><text x="415" y="554" fill="#94a3b8" text-anchor="middle" font-size="10">comandos simulados</text><text x="415" y="576" fill="#a78bfa" text-anchor="middle" font-size="9">sem kubeconfig</text>
+  </g>
+
+  <rect x="960" y="465" width="210" height="160" rx="14" fill="rgba(251,191,36,.04)" stroke="#fbbf24" stroke-dasharray="8 5"/>
+  <text x="975" y="485" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="10">KUBERNETES (opção)</text>
+  <rect x="985" y="510" width="160" height="48" rx="6" fill="#0f172a" stroke="#34d399"/><text x="1065" y="539" fill="#fff" font-family="JetBrains Mono, monospace" text-anchor="middle" font-size="11">Deployment × 2</text>
+  <rect x="985" y="570" width="160" height="36" rx="6" fill="#0f172a" stroke="#22d3ee"/><text x="1065" y="593" fill="#fff" font-family="JetBrains Mono, monospace" text-anchor="middle" font-size="10">Service / Ingress</text>
+
+  <text x="50" y="675" fill="#64748b" font-family="JetBrains Mono, monospace" font-size="11">HTTPS em produção · Assets com hash e cache imutável · index.html sem cache longo</text>
+</svg>

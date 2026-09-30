@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#17233b" />
+    <meta name="description" content="Um mistério interativo para aprender investigação e troubleshooting de Kubernetes com segurança no navegador." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🔎</text></svg>" />
+    <title>Kubernetes Incident Mystery</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#terminal-input">Ir para o terminal</a>
+    <header class="masthead">
+      <a class="identity" href="#top" aria-label="Kubernetes Incident Mystery — início">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 55 18v27L32 59 9 45V18Z"/><circle cx="32" cy="32" r="10"/><path d="M32 14v8m0 20v8M14 32h8m20 0h8m-30.5-12.5 5.7 5.7m13.6 13.6 5.7 5.7m0-25-5.7 5.7M25.2 38.8l-5.7 5.7"/></svg>
+        <span><b>K8S</b> INCIDENT<br>MYSTERY</span>
+      </a>
+      <div class="case-number"><span>ARQUIVO CONFIDENCIAL</span><strong id="case-number">CASE #404</strong></div>
+      <div class="status-pill"><i></i> SIMULADOR SEGURO</div>
+    </header>
+
+    <main id="top">
+      <section class="intro" aria-labelledby="case-title">
+        <p class="edition">CLUSTER CITY CHRONICLE · EDIÇÃO DE EMERGÊNCIA</p>
+        <div id="case-level" class="level-badge">NÍVEL 1 · INICIANTE</div>
+        <h1 id="case-title" aria-label="O INCIDENTE DO NAMESPACE FANTASMA"><span id="case-title-main">O INCIDENTE DO</span><br><em id="case-title-emphasis">NAMESPACE FANTASMA</em></h1>
+        <p id="case-lead" class="lead">Às 02:13, o checkout da Cluster City parou. Um Pod reinicia sem parar, um serviço perdeu seus endpoints e alguém alterou uma configuração crítica. Sua missão: investigar com <code>kubectl</code>, encontrar a causa raiz e restaurar a produção.</p>
+        <div class="mode-switch" role="group" aria-label="Escolha o modo de jogo">
+          <button class="mode active" data-mode="investigation" type="button">Modo investigação</button>
+          <button class="mode" data-mode="tutorial" type="button">Modo tutorial</button>
+        </div>
+      </section>
+
+      <section class="case-selection" aria-labelledby="case-selection-title">
+        <div>
+          <p class="panel-label">ESCOLHA SEU PRÓXIMO CASO</p>
+          <h2 id="case-selection-title">Níveis de investigação</h2>
+        </div>
+        <div id="case-selector" class="case-selector" role="list" aria-label="Casos disponíveis"></div>
+      </section>
+
+      <section class="workspace" aria-label="Área de investigação">
+        <aside class="case-file panel">
+          <div class="panel-label">01 · ARQUIVO DO CASO</div>
+          <div id="case-severity" class="stamp">SEV-1</div>
+          <h2 id="file-title">Checkout indisponível</h2>
+          <dl>
+            <div><dt>Cluster</dt><dd id="case-cluster">cluster-city</dd></div>
+            <div><dt>Namespace</dt><dd id="case-namespace">production</dd></div>
+            <div><dt>Início</dt><dd id="case-start">02:13 UTC</dd></div>
+            <div><dt>Impacto</dt><dd id="case-impact">100% das compras</dd></div>
+          </dl>
+          <blockquote><span id="case-testimony">“A aplicação estava saudável. Depois da última mudança, o checkout começou a reiniciar.”</span><cite id="case-witness">— Plantonista SRE</cite></blockquote>
+          <div class="objective">
+            <span>OBJETIVO</span>
+            <p id="case-objective">Descubra por que o checkout-api não alcança sua dependência e aplique a correção.</p>
+          </div>
+          <button id="reset-case" class="text-button" type="button">Reiniciar investigação</button>
+        </aside>
+
+        <section class="terminal-panel panel" aria-labelledby="terminal-title">
+          <div class="terminal-top">
+            <div>
+              <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            </div>
+            <h2 id="terminal-title">kubectl // cluster-city</h2>
+            <span id="terminal-namespace" class="terminal-ns">ns: production</span>
+          </div>
+          <div id="terminal-output" class="terminal-output" aria-live="polite" aria-label="Saída do terminal">
+            <div class="system-line">Kubernetes Incident Console v1.0</div>
+            <div class="system-line">Ambiente simulado — nenhum cluster real será alterado.</div>
+            <div class="system-line">Digite <b>help</b> para ver os comandos disponíveis.</div>
+          </div>
+          <form id="terminal-form" class="terminal-form">
+            <label for="terminal-input"><span>detective@cluster-city</span>:<b>~</b>$</label>
+            <input id="terminal-input" name="command" autocomplete="off" spellcheck="false" placeholder="kubectl get pods -n production" aria-describedby="terminal-help" />
+            <button type="submit" aria-label="Executar comando">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 7 7-7 7M15 19h4"/></svg>
+            </button>
+          </form>
+          <p id="terminal-help" class="terminal-help">↑↓ histórico · Ctrl+L limpar · Enter executar</p>
+          <div id="quick-commands" class="quick-commands" aria-label="Comandos rápidos">
+            <button type="button" data-command="kubectl get pods -n production">get pods</button>
+            <button type="button" data-command="kubectl get svc -n production">get svc</button>
+            <button type="button" data-command="kubectl get endpoints redis-service -n production">endpoints</button>
+          </div>
+        </section>
+
+        <aside class="investigation-rail">
+          <section id="tutorial-panel" class="tutorial panel" aria-labelledby="tutorial-title" hidden>
+            <div class="panel-label">02 · GUIA DE CAMPO</div>
+            <div class="tutorial-progress"><i id="tutorial-progress"></i></div>
+            <span id="tutorial-counter">PASSO 1 DE 9</span>
+            <h2 id="tutorial-title">Encontre o namespace</h2>
+            <p id="tutorial-copy">Liste os namespaces disponíveis para confirmar onde o incidente aconteceu.</p>
+            <button id="tutorial-command" type="button"><code>kubectl get namespaces</code><span>USAR COMANDO</span></button>
+            <button id="tutorial-hint" class="text-button" type="button">Mostrar explicação</button>
+            <p id="tutorial-explanation" class="explanation" hidden></p>
+          </section>
+
+          <section class="evidence panel" aria-labelledby="evidence-title">
+            <div class="panel-label">03 · QUADRO DE EVIDÊNCIAS</div>
+            <h2 id="evidence-title">Pistas coletadas</h2>
+            <ol id="evidence-list">
+              <li class="empty-evidence">Nenhuma pista ainda. Comece listando os Pods.</li>
+            </ol>
+          </section>
+        </aside>
+      </section>
+
+      <section class="field-notes" aria-labelledby="notes-title">
+        <div class="panel-label">ANOTAÇÕES DO DETETIVE</div>
+        <h2 id="notes-title">Como pensar durante um incidente</h2>
+        <div class="notes-grid">
+          <article><b>1</b><h3>Observe o sintoma</h3><p>Comece pelo estado dos workloads antes de assumir a causa.</p></article>
+          <article><b>2</b><h3>Siga a dependência</h3><p>Logs e eventos apontam qual componente investigar em seguida.</p></article>
+          <article><b>3</b><h3>Compare seletores</h3><p>Services só encontram Pods cujos labels correspondem ao selector.</p></article>
+          <article><b>4</b><h3>Corrija e valide</h3><p>Aplique a menor mudança possível e confirme endpoints e saúde.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <div id="success-dialog" class="success-dialog" role="dialog" aria-modal="true" aria-labelledby="success-title" hidden>
+      <div class="success-card">
+        <span>CASO ENCERRADO</span>
+        <h2 id="success-title">Produção restaurada.</h2>
+        <p id="success-copy">O selector do Service apontava para <code>app=redis-cache</code>, mas o Pod usava <code>app=redis</code>. Você corrigiu a rota e recuperou os endpoints.</p>
+        <div><strong id="case-score">1000 XP</strong><small>ROOT CAUSE DETECTED</small></div>
+        <button id="close-success" class="primary-button" type="button">Revisar evidências</button>
+      </div>
+    </div>
+
+    <footer><span>MODELO 1 · SIMULADOR BROWSER-ONLY</span><span>Inspirado no formato investigativo do SQL Murder Mystery</span></footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+services:
+  kubernetes-mystery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kubernetes-incident-mystery:local
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+    security_opt:
+      - no-new-privileges:true

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.venv*/
+*.log
+*.zip
+.DS_Store
+.vscode/
+.idea/
+docs/rendered/
+docs/rendered-clean*/
+docs/*contact-sheet.png
