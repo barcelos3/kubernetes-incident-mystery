@@ -40,12 +40,38 @@ Digite comandos no campo inferior e pressione `Enter`.
 Atalhos:
 
 - `help`: lista os comandos aceitos no caso atual.
+- `aliases`: mostra os aliases `kubectl` habilitados por padrão.
+- `resources`: mostra as formas singular, plural e abreviada aceitas.
 - `clear`: limpa a saída visual sem reiniciar o caso.
 - `reset`: restaura o caso atual.
 - `↑` e `↓`: navegam pelo histórico.
 - `Ctrl+L`: limpa a saída.
 
 Os botões abaixo do terminal executam comandos frequentes do caso selecionado.
+
+### Abreviações e aliases
+
+Os recursos dos casos aceitam singular, plural e abreviação oficial, como `pod`/`pods`/`po`, `service`/`services`/`svc` e `deployment`/`deployments`/`deploy`. Aliases comuns como `k`, `kgp`, `kgs`, `kgns`, `kgcm`, `kl`, `kex` e `krrd` ficam habilitados por padrão.
+
+### Editor e arquivos simulados
+
+Use `vi arquivo.yaml` ou `vim arquivo.yaml` para abrir o editor. O botão **`:wq salvar`** grava o conteúdo no workspace virtual; **`:q! cancelar`** fecha sem salvar. Os comandos `ls` e `cat arquivo.yaml` permitem inspecionar os arquivos.
+
+Para aplicar um manifesto:
+
+```bash
+kubectl apply -f arquivo.yaml
+# ou
+kaf arquivo.yaml
+```
+
+Para editar diretamente um objeto do caso:
+
+```bash
+kubectl edit svc redis-service -n production
+```
+
+Consulte [Abreviações, aliases e editor vi](05-KUBECTL-ALIASES-EDITOR.md) para o catálogo e exemplos completos.
 
 ## 6. Evidências e conclusão
 

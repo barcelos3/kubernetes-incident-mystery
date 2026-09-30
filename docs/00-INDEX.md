@@ -6,8 +6,9 @@
 2. [Arquitetura técnica](02-ARCHITECTURE.md)
 3. [Guia de implantação](03-DEPLOYMENT.md)
 4. [Roadmap e melhorias](04-ROADMAP.md)
-5. [Diagrama de arquitetura](architecture.svg)
-6. [Diagrama navegável](architecture.html)
+5. [Abreviações, aliases e editor vi](05-KUBECTL-ALIASES-EDITOR.md)
+6. [Diagrama de arquitetura](architecture.svg)
+7. [Diagrama navegável](architecture.html)
 
 ## Artefatos de implantação
 

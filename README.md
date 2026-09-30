@@ -3,6 +3,7 @@
 > Documentação completa: [`docs/00-INDEX.md`](docs/00-INDEX.md)  
 > Apresentação: [`docs/Kubernetes-Incident-Mystery-Apresentacao.pptx`](docs/Kubernetes-Incident-Mystery-Apresentacao.pptx)  
 > Implantação: [`docs/03-DEPLOYMENT.md`](docs/03-DEPLOYMENT.md)
+> Aliases e editor `vi`: [`docs/05-KUBECTL-ALIASES-EDITOR.md`](docs/05-KUBECTL-ALIASES-EDITOR.md)
 
 Jogo educacional inspirado no formato investigativo do SQL Murder Mystery. O jogador usa comandos `kubectl` para investigar um incidente fictício, identificar a causa raiz e restaurar a aplicação.
 
@@ -20,6 +21,8 @@ O modelo atual é totalmente seguro e não acessa clusters reais. O terminal int
    - NetworkPolicies, default-deny e validação de conectividade TCP.
 
 Cada caso possui narrativa, comandos rápidos, evidências próprias, pontuação e tutorial independente. O progresso dos casos concluídos fica salvo no navegador.
+
+O terminal também aceita singular, plural e abreviações oficiais dos recursos usados nos casos, aliases comuns como `k`, `kgp`, `kgns`, `kgs`, `kgd`, `kgcm`, `kl` e `krrd`, além de um workspace virtual com `vi`/`vim`, `cat`, `ls`, `kubectl edit` e `kubectl apply -f`.
 
 ### Modos
 

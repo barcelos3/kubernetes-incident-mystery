@@ -120,6 +120,23 @@
       </section>
     </main>
 
+    <div id="vim-editor" class="vim-editor" role="dialog" aria-modal="true" aria-labelledby="vim-title" hidden>
+      <section class="vim-window">
+        <header>
+          <strong id="vim-title">VI // EDITOR SIMULADO</strong>
+          <span id="vim-filename"></span>
+        </header>
+        <textarea id="vim-content" aria-label="Conteúdo do arquivo" spellcheck="false"></textarea>
+        <footer>
+          <span>-- INSERT --</span>
+          <div>
+            <button id="vim-cancel" type="button">:q! cancelar</button>
+            <button id="vim-save" type="button">:wq salvar</button>
+          </div>
+        </footer>
+      </section>
+    </div>
+
     <div id="success-dialog" class="success-dialog" role="dialog" aria-modal="true" aria-labelledby="success-title" hidden>
       <div class="success-card">
         <span>CASO ENCERRADO</span>

@@ -64,6 +64,8 @@ export const cases: CaseContent[] = [
       'kubectl get pods -n production --show-labels',
       'kubectl get endpoints redis-service -n production',
       `kubectl patch svc redis-service -n production -p '{"spec":{"selector":{"app":"redis"}}}'`,
+      'kubectl edit svc redis-service -n production',
+      'vi redis-fix.yaml  # depois: kubectl apply -f redis-fix.yaml',
     ],
     tutorialSteps: [
       { title: 'Encontre o namespace', copy: 'Liste os namespaces disponíveis para confirmar onde o incidente aconteceu.', command: 'kubectl get namespaces', explanation: 'Namespaces separam recursos dentro do cluster. Confirme o contexto antes de agir.', discovery: 'production-namespace' },
@@ -117,6 +119,8 @@ export const cases: CaseContent[] = [
       'kubectl describe deployment payments-worker -n staging',
       'kubectl get configmap payments-config -n staging -o yaml',
       `kubectl patch configmap payments-config -n staging -p '{"data":{"PAYMENT_QUEUE_URL":"amqp://rabbitmq:5672"}}'`,
+      'kubectl edit configmap payments-config -n staging',
+      'vim payments-fix.yaml  # depois: kubectl apply -f payments-fix.yaml',
       'kubectl rollout restart deployment payments-worker -n staging',
     ],
     tutorialSteps: [
@@ -166,6 +170,8 @@ export const cases: CaseContent[] = [
       'kubectl describe networkpolicy allow-api-db -n secure-prod',
       'kubectl get pods -n secure-prod --show-labels',
       `kubectl patch networkpolicy allow-api-db -n secure-prod -p '{"spec":{"podSelector":{"matchLabels":{"role":"api"}}}}'`,
+      'kubectl edit networkpolicy allow-api-db -n secure-prod',
+      'vi allow-api-db.yaml  # depois: kubectl apply -f allow-api-db.yaml',
       'kubectl exec orders-api-5d7f8f6b9-q7w4e -n secure-prod -- nc -zvw3 postgres 5432',
     ],
     tutorialSteps: [

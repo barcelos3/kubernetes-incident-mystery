@@ -8,6 +8,7 @@ const browser = await chromium.launch({
 })
 
 const errors = []
+const baseURL = process.env.BASE_URL ?? 'http://127.0.0.1:4174/'
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } })
 const page = await context.newPage()
 page.on('pageerror', error => errors.push(error.message))
@@ -15,34 +16,51 @@ page.on('console', message => {
   if (message.type() === 'error') errors.push(message.text())
 })
 
-await page.goto('http://127.0.0.1:4174/', { waitUntil: 'networkidle' })
+await page.goto(baseURL, { waitUntil: 'networkidle' })
 assert.equal(await page.title(), 'Kubernetes Incident Mystery')
 assert.equal(await page.locator('h1').getAttribute('aria-label'), 'O INCIDENTE DO NAMESPACE FANTASMA')
 assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false)
+
+const submit = async command => {
+  await page.locator('#terminal-input').fill(command)
+  await page.locator('#terminal-form').evaluate(form => form.requestSubmit())
+  await page.waitForTimeout(30)
+}
 
 await page.getByRole('button', { name: 'Modo tutorial' }).click()
 assert.equal(await page.locator('#tutorial-panel').isVisible(), true)
 assert.match(await page.locator('#tutorial-title').innerText(), /Encontre o namespace/)
 
 const commands = [
-  'kubectl get namespaces',
-  'kubectl get pods -n production',
-  'kubectl describe pod checkout-api-7d9c8b6f4-x2k9m -n production',
-  'kubectl logs checkout-api-7d9c8b6f4-x2k9m -n production',
-  'kubectl get svc -n production',
-  'kubectl describe svc redis-service -n production',
-  'kubectl get pods -n production --show-labels',
-  'kubectl get endpoints redis-service -n production',
-  `kubectl patch svc redis-service -n production -p '{"spec":{"selector":{"app":"redis"}}}'`,
+  'kgns',
+  'kgp -n production',
+  'kdp checkout-api-7d9c8b6f4-x2k9m -n production',
+  'kl checkout-api-7d9c8b6f4-x2k9m -n production',
+  'kgs -n production',
+  'kds redis-service -n production',
+  'kgpsl -n production',
+  'kgep redis-service -n production',
 ]
 
 for (const command of commands) {
-  await page.locator('#terminal-input').fill(command)
-  await page.locator('#terminal-form').evaluate(form => form.requestSubmit())
-  await page.waitForTimeout(30)
+  await submit(command)
 }
 
-assert.match(await page.locator('#terminal-output').innerText(), /service\/redis-service patched/)
+await submit('vi redis-fix.yaml')
+await page.locator('#vim-editor').waitFor({ state: 'visible' })
+await page.locator('#vim-content').fill(`apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: production
+spec:
+  selector:
+    app: redis`)
+await page.locator('#vim-save').click()
+await page.locator('#vim-editor').waitFor({ state: 'hidden' })
+await submit('kaf redis-fix.yaml')
+
+assert.match(await page.locator('#terminal-output').innerText(), /service\/redis-service configured/)
 assert.match(await page.locator('#evidence-list').innerText(), /Causa raiz corrigida/)
 await page.locator('#success-dialog').waitFor({ state: 'visible', timeout: 2000 })
 assert.equal(await page.locator('#success-dialog').isVisible(), true)
@@ -53,9 +71,7 @@ const runCase = async (caseId, expectedTitle, commandsForCase) => {
   await page.waitForTimeout(250)
   assert.match(await page.locator('#case-title').getAttribute('aria-label'), expectedTitle)
   for (const command of commandsForCase) {
-    await page.locator('#terminal-input').fill(command)
-    await page.locator('#terminal-form').evaluate(form => form.requestSubmit())
-    await page.waitForTimeout(30)
+    await submit(command)
   }
   await page.locator('#success-dialog').waitFor({ state: 'visible', timeout: 2000 })
   await page.getByRole('button', { name: 'Revisar evidências' }).click()
@@ -84,7 +100,7 @@ assert.equal(await page.locator('.case-option em').count(), 3)
 await page.screenshot({ path: '/home/comitre/kubernetes-incident-mystery/kubernetes-mystery-preview.png', fullPage: true })
 
 const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
-await mobile.goto('http://127.0.0.1:4174/', { waitUntil: 'networkidle' })
+await mobile.goto(baseURL, { waitUntil: 'networkidle' })
 assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false)
 assert.equal(await mobile.locator('#terminal-input').isVisible(), true)
 await mobile.screenshot({ path: '/home/comitre/kubernetes-incident-mystery/kubernetes-mystery-mobile.png', fullPage: true })
@@ -94,7 +110,9 @@ console.log(JSON.stringify({
   title: await page.title(),
   tutorial: true,
   casesVerified: 3,
-  commandsExecuted: 22,
+  commandsExecuted: 23,
+  aliasesVerified: true,
+  vimWorkspaceVerified: true,
   solved: true,
   desktopOverflow: false,
   mobileOverflow: false,

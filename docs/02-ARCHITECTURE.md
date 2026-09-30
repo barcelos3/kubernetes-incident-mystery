@@ -16,6 +16,8 @@ Navegador ──HTTPS──> CDN / Nginx / Static Host
    │
    ├── interface investigativa
    ├── simulador de comandos kubectl
+   ├── normalizador de recursos e aliases
+   ├── editor vi e filesystem virtual em memória
    ├── motor de casos e níveis
    └── localStorage de progresso
 ```
@@ -29,9 +31,10 @@ Motor determinístico do terminal. Cada sessão mantém somente o estado necess�
 - correção aplicada;
 - reinício executado;
 - conectividade validada;
+- arquivos YAML/TXT criados no workspace virtual;
 - caso solucionado.
 
-Comandos desconhecidos retornam erro controlado. Não existe chamada ao shell, `kubectl`, API Kubernetes ou rede externa.
+O normalizador converte singular, plural e abreviações oficiais dos recursos usados nos casos para uma forma canônica e expande aliases comuns antes da avaliação. Comandos desconhecidos retornam erro controlado. Não existe chamada ao shell, `kubectl`, API Kubernetes ou rede externa.
 
 ### `src/case-content.ts`
 
@@ -50,6 +53,8 @@ Controlador da interface:
 
 - alternância de caso e modo;
 - terminal e histórico;
+- editor `vi`/`vim` acessível em modal;
+- gravação e aplicação de manifestos no workspace virtual;
 - evolução do tutorial;
 - quadro de evidências;
 - persistência local de casos concluídos;
@@ -63,16 +68,19 @@ Interface sem framework, acessível e responsiva. Não há renderização no ser
 
 1. O usuário escolhe um caso.
 2. A interface cria uma sessão isolada para o ID do caso.
-3. O comando é normalizado e avaliado pelo simulador.
-4. O resultado retorna saída, evidências e estado de solução.
-5. A interface atualiza terminal, tutorial e quadro de evidências.
-6. Ao concluir, o ID do caso é salvo no `localStorage`.
+3. Aliases e formas de recurso são normalizados.
+4. O comando é avaliado pelo simulador; operações `vi`, `cat`, `ls`, `edit` e `apply` usam somente o workspace em memória.
+5. O resultado retorna saída, evidências, solicitação opcional de editor e estado de solução.
+6. A interface atualiza terminal, tutorial e quadro de evidências.
+7. Ao concluir, o ID do caso é salvo no `localStorage`.
 
 ## Fronteiras de segurança
 
 - Sem backend e sem segredos.
 - Sem `eval`, shell ou execução arbitrária.
 - Sem acesso ao kubeconfig.
+- O editor não lê nem grava o sistema de arquivos real.
+- Somente nomes locais `.yaml`, `.yml` e `.txt` são aceitos.
 - Conteúdo dinâmico é inserido com `textContent`.
 - A imagem de produção usa Nginx não privilegiado.
 - O manifesto Kubernetes remove capabilities e bloqueia privilege escalation.

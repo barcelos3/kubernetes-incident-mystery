@@ -1,6 +1,6 @@
 import './style.css'
 import { cases, getCaseContent, type CaseContent } from './case-content'
-import { createMysterySession, type CommandResult } from './simulator'
+import { createMysterySession, listKubectlAliases, listResourceTypeAliases, type CommandResult, type EditorRequest } from './simulator'
 
 const output = document.querySelector<HTMLElement>('#terminal-output')!
 const form = document.querySelector<HTMLFormElement>('#terminal-form')!
@@ -38,12 +38,18 @@ const successTitle = document.querySelector<HTMLElement>('#success-title')!
 const successCopy = document.querySelector<HTMLElement>('#success-copy')!
 const caseScore = document.querySelector<HTMLElement>('#case-score')!
 const closeSuccess = document.querySelector<HTMLButtonElement>('#close-success')!
+const vimEditor = document.querySelector<HTMLElement>('#vim-editor')!
+const vimFilename = document.querySelector<HTMLElement>('#vim-filename')!
+const vimContent = document.querySelector<HTMLTextAreaElement>('#vim-content')!
+const vimSave = document.querySelector<HTMLButtonElement>('#vim-save')!
+const vimCancel = document.querySelector<HTMLButtonElement>('#vim-cancel')!
 
 let activeCase: CaseContent = cases[0]
 let session = createMysterySession(activeCase.id)
 let mode: 'investigation' | 'tutorial' = 'investigation'
 let tutorialIndex = 0
 let historyIndex = 0
+let activeEditor: EditorRequest | null = null
 const commandHistory: string[] = []
 const evidence = new Set<string>()
 const completedCases = loadCompletedCases()
@@ -161,6 +167,8 @@ function selectCase(id: string) {
   evidence.clear()
   tutorialIndex = 0
   successDialog.hidden = true
+  vimEditor.hidden = true
+  activeEditor = null
   output.replaceChildren()
   const line = document.createElement('div')
   line.className = 'system-line'
@@ -183,6 +191,39 @@ function appendEntry(command: string, result: CommandResult) {
   wrapper.append(commandLine, pre)
   output.append(wrapper)
   output.scrollTop = output.scrollHeight
+}
+
+function openEditor(editor: EditorRequest) {
+  activeEditor = editor
+  vimFilename.textContent = editor.filename
+  vimContent.value = editor.content
+  vimEditor.hidden = false
+  window.setTimeout(() => vimContent.focus(), 0)
+}
+
+function processResult(command: string, result: CommandResult) {
+  appendEntry(command, result)
+  result.discovered.forEach(key => evidence.add(key))
+  renderEvidence()
+  if (result.editor) openEditor(result.editor)
+
+  if (mode === 'tutorial') {
+    const step = activeCase.tutorialSteps[tutorialIndex]
+    if (step && result.discovered.includes(step.discovery)) {
+      tutorialIndex = Math.min(tutorialIndex + 1, activeCase.tutorialSteps.length - 1)
+      window.setTimeout(renderTutorial, 220)
+    }
+  }
+
+  if (result.solved) {
+    completedCases.add(activeCase.id)
+    saveCompletedCases()
+    renderCaseSelector()
+    window.setTimeout(() => {
+      successDialog.hidden = false
+      closeSuccess.focus()
+    }, 350)
+  }
 }
 
 function renderEvidence() {
@@ -221,8 +262,24 @@ function showHelp() {
     ok: true,
     solved: session.isSolved(),
     discovered: [],
-    output: ['COMANDOS DESTE CASO', ...activeCase.helpCommands, '', 'Atalhos locais: help, clear, reset'].join('\n'),
+    output: [
+      'COMANDOS DESTE CASO',
+      ...activeCase.helpCommands,
+      '',
+      'Workspace: vi <arquivo.yaml>, vim <arquivo.yaml>, cat <arquivo>, ls, kubectl apply -f <arquivo>',
+      'Atalhos locais: aliases, resources, help, clear, reset',
+    ].join('\n'),
   })
+}
+
+function showAliases() {
+  const lines = Object.entries(listKubectlAliases()).map(([alias, command]) => `${alias.padEnd(10)} ${command}`)
+  appendEntry('aliases', { ok: true, solved: session.isSolved(), discovered: [], output: ['ALIASES ATIVOS', ...lines].join('\n') })
+}
+
+function showResourceAliases() {
+  const lines = Object.entries(listResourceTypeAliases()).map(([resource, forms]) => `${resource.padEnd(16)} ${forms.join(', ')}`)
+  appendEntry('resources', { ok: true, solved: session.isSolved(), discovered: [], output: ['FORMAS DE RECURSO ACEITAS', ...lines].join('\n') })
 }
 
 function runCommand(rawCommand: string) {
@@ -239,33 +296,21 @@ function runCommand(rawCommand: string) {
     showHelp()
     return
   }
+  if (command.toLowerCase() === 'aliases' || command.toLowerCase() === 'alias') {
+    showAliases()
+    return
+  }
+  if (command.toLowerCase() === 'resources') {
+    showResourceAliases()
+    return
+  }
   if (command.toLowerCase() === 'reset') {
     resetCase()
     return
   }
 
   const result = session.run(command)
-  appendEntry(command, result)
-  result.discovered.forEach(key => evidence.add(key))
-  renderEvidence()
-
-  if (mode === 'tutorial') {
-    const step = activeCase.tutorialSteps[tutorialIndex]
-    if (step && result.discovered.includes(step.discovery)) {
-      tutorialIndex = Math.min(tutorialIndex + 1, activeCase.tutorialSteps.length - 1)
-      window.setTimeout(renderTutorial, 220)
-    }
-  }
-
-  if (result.solved) {
-    completedCases.add(activeCase.id)
-    saveCompletedCases()
-    renderCaseSelector()
-    window.setTimeout(() => {
-      successDialog.hidden = false
-      closeSuccess.focus()
-    }, 350)
-  }
+  processResult(command, result)
 }
 
 function resetCase() {
@@ -279,9 +324,25 @@ function resetCase() {
   intro.textContent = `${activeCase.number} reiniciado. O ambiente voltou ao estado inicial.`
   output.append(intro)
   successDialog.hidden = true
+  vimEditor.hidden = true
+  activeEditor = null
   renderEvidence()
   renderTutorial()
   input.focus()
+}
+
+function closeEditor() {
+  vimEditor.hidden = true
+  activeEditor = null
+  input.focus()
+}
+
+function saveEditor() {
+  if (!activeEditor) return
+  const editor = activeEditor
+  const result = session.saveFile(editor.filename, vimContent.value, editor.applyOnSave)
+  processResult(`:wq ${editor.filename}`, result)
+  if (result.ok) closeEditor()
 }
 
 form.addEventListener('submit', event => {
@@ -323,6 +384,21 @@ tutorialHint.addEventListener('click', () => {
   tutorialHint.textContent = tutorialExplanation.hidden ? 'Mostrar explicação' : 'Ocultar explicação'
 })
 resetButton.addEventListener('click', resetCase)
+vimSave.addEventListener('click', saveEditor)
+vimCancel.addEventListener('click', () => {
+  appendEntry(':q!', { ok: true, solved: session.isSolved(), discovered: [], output: 'edição cancelada' })
+  closeEditor()
+})
+vimContent.addEventListener('keydown', event => {
+  if (event.ctrlKey && event.key.toLowerCase() === 's') {
+    event.preventDefault()
+    saveEditor()
+  }
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    vimCancel.click()
+  }
+})
 closeSuccess.addEventListener('click', () => {
   successDialog.hidden = true
   input.focus()
