@@ -9,7 +9,7 @@ Jogo educacional inspirado no formato investigativo do SQL Murder Mystery. O jog
 
 ## Modelo 1 — Simulador no navegador
 
-O modelo atual é totalmente seguro e não acessa clusters reais. O terminal interpreta apenas comandos previstos pelo caso.
+O modelo atual é totalmente seguro e não acessa clusters reais. O terminal reconhece todas as operações oficiais de nível superior do `kubectl`; comandos ligados aos casos retornam dados detalhados e recursos indisponíveis retornam respostas simuladas como `No resources found` ou `NotFound`.
 
 ### Casos disponíveis
 
@@ -23,6 +23,8 @@ O modelo atual é totalmente seguro e não acessa clusters reais. O terminal int
 Cada caso possui narrativa, comandos rápidos, evidências próprias, pontuação e tutorial independente. O progresso dos casos concluídos fica salvo no navegador.
 
 O terminal também aceita singular, plural e abreviações oficiais dos recursos usados nos casos, aliases comuns como `k`, `kgp`, `kgns`, `kgs`, `kgd`, `kgcm`, `kl` e `krrd`, além de um workspace virtual com `vi`/`vim`, `cat`, `ls`, `kubectl edit` e `kubectl apply -f`.
+
+Consultas globais funcionam com `-A` e `--all-namespaces`, inclusive `k get po -A` e `kubectl get po -A`. Tipos sem objetos disponíveis continuam sendo aceitos e retornam uma lista vazia.
 
 ### Modos
 

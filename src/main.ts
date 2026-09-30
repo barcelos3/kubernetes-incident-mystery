@@ -266,6 +266,8 @@ function showHelp() {
       'COMANDOS DESTE CASO',
       ...activeCase.helpCommands,
       '',
+      'Cobertura kubectl: todas as operações oficiais; recursos ausentes retornam respostas simuladas.',
+      'Consultas globais: k get po -A ou kubectl get po --all-namespaces',
       'Workspace: vi <arquivo.yaml>, vim <arquivo.yaml>, cat <arquivo>, ls, kubectl apply -f <arquivo>',
       'Atalhos locais: aliases, resources, help, clear, reset',
     ].join('\n'),

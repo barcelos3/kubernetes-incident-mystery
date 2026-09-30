@@ -256,6 +256,198 @@ describe('Kubernetes mystery simulator', () => {
     expect(session.run('kex orders-api-5d7f8f6b9-q7w4e -n secure-prod -- nc -zvw3 postgres 5432').solved).toBe(true)
   })
 
+  it('accepts kubectl get pods across all namespaces with kubectl or k', () => {
+    const session = createMysterySession()
+    const kubectl = session.run('kubectl get po -A')
+    const alias = session.run('k get po -A')
+
+    for (const result of [kubectl, alias]) {
+      expect(result.ok).toBe(true)
+      expect(result.output).toContain('NAMESPACE')
+      expect(result.output).toContain('production')
+      expect(result.output).toContain('staging')
+      expect(result.output).toContain('secure-prod')
+      expect(result.output).not.toContain('comando não reconhecido')
+    }
+    expect(alias.output).toBe(kubectl.output)
+  })
+
+  it('preserves uppercase -A semantics and rejects lowercase -a', () => {
+    const session = createMysterySession()
+
+    expect(session.run('kubectl get po -A').output).toContain('NAMESPACE')
+    const lowercase = session.run('kubectl get po -a')
+    expect(lowercase.ok).toBe(false)
+    expect(lowercase.output).toContain("unknown shorthand flag: 'a'")
+  })
+
+  it('keeps all-namespace output synchronized with the active case state', () => {
+    const session = createMysterySession('poisoned-configmap')
+
+    session.run(`kubectl patch cm payments-config -n staging -p '{"data":{"PAYMENT_QUEUE_URL":"amqp://rabbitmq:5672"}}'`)
+    session.run('kubectl rollout restart deploy payments-worker -n staging')
+
+    const output = session.run('kubectl get po -A').output
+    const workerLine = output.split('\n').find(line => line.includes('payments-worker'))
+    expect(workerLine).toContain('1/1')
+    expect(workerLine).toContain('Running')
+    expect(workerLine).not.toContain('CrashLoopBackOff')
+  })
+
+  it('returns Kubernetes-style NotFound for unavailable object targets', () => {
+    const session = createMysterySession()
+
+    for (const command of [
+      'kubectl edit secret missing -n production',
+      'kubectl describe daemonset missing -n production',
+      'kubectl delete job missing -n production',
+      `kubectl patch deployment missing -n production -p '{"spec":{}}'`,
+    ]) {
+      const result = session.run(command)
+      expect(result.ok, command).toBe(false)
+      expect(result.output, command).toContain('NotFound')
+      expect(result.output, command).not.toContain('comando não reconhecido')
+    }
+  })
+
+  it('honors object names in generic get requests', () => {
+    const session = createMysterySession()
+    const existing = session.run('kubectl get pod checkout-api-7d9c8b6f4-x2k9m -n production')
+
+    expect(existing.ok).toBe(true)
+    expect(existing.output).toContain('checkout-api-7d9c8b6f4-x2k9m')
+    expect(existing.output).not.toContain('web-frontend')
+
+    for (const command of [
+      'kubectl get pod missing -n production',
+      'kubectl get secret missing -n production',
+      'kubectl get pod/missing -A',
+    ]) {
+      const result = session.run(command)
+      expect(result.ok, command).toBe(false)
+      expect(result.output, command).toContain('NotFound')
+    }
+  })
+
+  it('supports global kubectl flags placed before or after the operation', () => {
+    const session = createMysterySession()
+    const commands = [
+      'kubectl -n production get po',
+      'kubectl --context cluster-city get po',
+      'kubectl get po --context cluster-city -n production',
+    ]
+
+    for (const command of commands) {
+      const result = session.run(command)
+      expect(result.ok, command).toBe(true)
+      expect(result.output, command).toContain('checkout-api')
+      expect(result.output, command).not.toContain('unknown command')
+    }
+  })
+
+  it('honors JSON output formatting for pod queries', () => {
+    const session = createMysterySession()
+
+    for (const command of ['kubectl get pods -A -o json', 'kubectl get pods -A -o=json']) {
+      const result = session.run(command)
+      const payload = JSON.parse(result.output)
+      expect(result.ok, command).toBe(true)
+      expect(payload.kind, command).toBe('List')
+      expect(payload.items.some((item: { metadata: { namespace: string } }) => item.metadata.namespace === 'production'), command).toBe(true)
+    }
+  })
+
+  it('returns simulated non-pod resources when output flags use the generic parser', () => {
+    const session = createMysterySession()
+    const result = session.run('kubectl get svc -n production -o json')
+    const payload = JSON.parse(result.output)
+
+    expect(result.ok).toBe(true)
+    expect(payload.items.map((item: { metadata: { name: string } }) => item.metadata.name)).toContain('redis-service')
+  })
+
+  it('keeps detailed outputs synchronized after the beginner case is solved', () => {
+    const session = createMysterySession()
+    session.run(`kubectl patch svc redis-service -n production -p '{"spec":{"selector":{"app":"redis"}}}'`)
+
+    expect(session.run('kubectl describe pod checkout-api-7d9c8b6f4-x2k9m -n production').output).toContain('State: Running')
+    expect(session.run('kubectl describe svc redis-service -n production').output).toContain('Selector: app=redis')
+    expect(session.run('kubectl get deployment -n production').output).toContain('checkout-api    2/2')
+  })
+
+  it('accepts get for unavailable Kubernetes resource types', () => {
+    const session = createMysterySession()
+    const commands = [
+      'kubectl get daemonsets -A',
+      'k get secrets --all-namespaces',
+      'kubectl get widgets.example.io -n production',
+      'kubectl get -A statefulsets -o wide',
+    ]
+
+    for (const command of commands) {
+      const result = session.run(command)
+      expect(result.ok).toBe(true)
+      expect(result.output).toContain('No resources found')
+      expect(result.output).not.toContain('comando não reconhecido')
+    }
+  })
+
+  it('parses every official kubectl operation without a simulator-specific rejection', () => {
+    const session = createMysterySession()
+    const commands = [
+      'kubectl alpha',
+      'kubectl annotate pod missing owner=sre',
+      'kubectl api-resources',
+      'kubectl api-versions',
+      'kubectl apply -f missing.yaml',
+      'kubectl attach missing',
+      'kubectl auth can-i get pods',
+      'kubectl autoscale deployment missing --max=3',
+      'kubectl certificate approve missing',
+      'kubectl cluster-info',
+      'kubectl completion bash',
+      'kubectl config current-context',
+      'kubectl cordon missing-node',
+      'kubectl cp missing:/tmp/a ./a',
+      'kubectl create deployment demo --image=nginx',
+      'kubectl debug pod/missing --image=busybox',
+      'kubectl delete job missing',
+      'kubectl describe daemonset missing',
+      'kubectl diff -f missing.yaml',
+      'kubectl drain missing-node',
+      'kubectl edit secret missing',
+      'kubectl events',
+      'kubectl exec missing -- true',
+      'kubectl explain deployment.spec',
+      'kubectl expose deployment missing --port=80',
+      'kubectl get secrets -A',
+      'kubectl kustomize .',
+      'kubectl label pod missing app=test',
+      'kubectl logs missing',
+      'kubectl options',
+      `kubectl patch deployment missing -p '{"spec":{}}'`,
+      'kubectl plugin list',
+      'kubectl port-forward pod/missing 8080:80',
+      'kubectl proxy',
+      'kubectl replace -f missing.yaml',
+      'kubectl rollout status deployment/missing',
+      'kubectl run demo --image=nginx',
+      'kubectl scale deployment missing --replicas=2',
+      'kubectl set image deployment/missing app=nginx',
+      'kubectl taint nodes missing dedicated=test:NoSchedule',
+      'kubectl top pod',
+      'kubectl uncordon missing-node',
+      'kubectl version --client',
+      'kubectl wait --for=condition=ready pod/missing',
+    ]
+
+    for (const command of commands) {
+      const result = session.run(command)
+      expect(result.output, command).not.toContain('comando não reconhecido no simulador')
+      expect(result.output, command).not.toContain('unknown command')
+    }
+  })
+
   it('supports the tutorial discovery commands and reset', () => {
     const session = createMysterySession()
 

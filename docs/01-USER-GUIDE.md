@@ -53,6 +53,17 @@ Os botões abaixo do terminal executam comandos frequentes do caso selecionado.
 
 Os recursos dos casos aceitam singular, plural e abreviação oficial, como `pod`/`pods`/`po`, `service`/`services`/`svc` e `deployment`/`deployments`/`deploy`. Aliases comuns como `k`, `kgp`, `kgs`, `kgns`, `kgcm`, `kl`, `kex` e `krrd` ficam habilitados por padrão.
 
+O parser também reconhece todas as operações oficiais de nível superior do `kubectl`. Para recursos sem objetos simulados, a consulta retorna uma resposta vazia em vez de `comando não reconhecido`.
+
+```bash
+k get po -A
+kubectl get po --all-namespaces
+kubectl get daemonsets -A
+kubectl api-resources
+kubectl explain deployment.spec
+kubectl auth can-i get pods
+```
+
 ### Editor e arquivos simulados
 
 Use `vi arquivo.yaml` ou `vim arquivo.yaml` para abrir o editor. O botão **`:wq salvar`** grava o conteúdo no workspace virtual; **`:q! cancelar`** fecha sem salvar. Os comandos `ls` e `cat arquivo.yaml` permitem inspecionar os arquivos.
@@ -96,7 +107,8 @@ location.reload()
 
 ## 8. Limitações intencionais
 
-- O terminal aceita apenas comandos previstos no cenário.
+- Todas as operações oficiais de nível superior são reconhecidas, mas somente os recursos dos casos possuem estado e dados detalhados.
+- Recursos indisponíveis retornam `No resources found`, e operações sem implementação específica são aceitas sem alterar o caso.
 - A saída imita `kubectl`, mas não executa binários.
 - Não há login, servidor de aplicação ou banco de dados.
 - O progresso é local ao navegador e não sincroniza entre dispositivos.

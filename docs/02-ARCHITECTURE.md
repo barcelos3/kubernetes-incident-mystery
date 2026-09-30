@@ -34,7 +34,7 @@ Motor determinístico do terminal. Cada sessão mantém somente o estado necess�
 - arquivos YAML/TXT criados no workspace virtual;
 - caso solucionado.
 
-O normalizador converte singular, plural e abreviações oficiais dos recursos usados nos casos para uma forma canônica e expande aliases comuns antes da avaliação. Comandos desconhecidos retornam erro controlado. Não existe chamada ao shell, `kubectl`, API Kubernetes ou rede externa.
+O normalizador converte singular, plural e abreviações oficiais dos recursos usados nos casos para uma forma canônica e expande aliases comuns antes da avaliação. Um fallback genérico reconhece todas as operações oficiais de nível superior do `kubectl`, incluindo flags globais como `-A`/`--all-namespaces`; recursos ausentes retornam listas vazias ou `NotFound`. Não existe chamada ao shell, `kubectl`, API Kubernetes ou rede externa.
 
 ### `src/case-content.ts`
 

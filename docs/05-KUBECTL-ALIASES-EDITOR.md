@@ -37,6 +37,23 @@ kubectl get po -n production
 
 Use `resources` no terminal do jogo para consultar a lista disponível.
 
+## Comandos e recursos não disponíveis no caso
+
+O terminal reconhece todas as operações oficiais de nível superior do `kubectl`, mesmo quando o recurso não possui objetos no cenário. Consultas retornam listas vazias em vez de um erro interno do simulador.
+
+```bash
+k get po -A
+kubectl get po --all-namespaces
+kubectl get daemonsets -A
+kubectl get secrets -n production
+kubectl api-resources
+kubectl api-versions
+kubectl explain statefulset.spec
+kubectl auth can-i get pods
+```
+
+Para `get`, também são aceitas flags antes ou depois do tipo, como `kubectl get -A statefulsets -o wide`. Operações sem implementação específica retornam uma mensagem segura e não modificam o estado do caso.
+
 ## Aliases habilitados por padrão
 
 Use `aliases` ou `alias` no terminal para consultar o catálogo completo.

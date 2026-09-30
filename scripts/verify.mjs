@@ -31,6 +31,13 @@ await page.getByRole('button', { name: 'Modo tutorial' }).click()
 assert.equal(await page.locator('#tutorial-panel').isVisible(), true)
 assert.match(await page.locator('#tutorial-title').innerText(), /Encontre o namespace/)
 
+await submit('k get po -A')
+assert.match(await page.locator('#terminal-output').innerText(), /NAMESPACE[\s\S]*production[\s\S]*staging[\s\S]*secure-prod/)
+await submit('kubectl get po -A')
+await submit('kubectl get daemonsets --all-namespaces')
+assert.match(await page.locator('#terminal-output').innerText(), /No resources found in all namespaces/)
+assert.doesNotMatch(await page.locator('#terminal-output').innerText(), /comando não reconhecido no simulador/)
+
 const commands = [
   'kgns',
   'kgp -n production',
@@ -110,7 +117,8 @@ console.log(JSON.stringify({
   title: await page.title(),
   tutorial: true,
   casesVerified: 3,
-  commandsExecuted: 23,
+  commandsExecuted: 26,
+  genericKubectlFallbackVerified: true,
   aliasesVerified: true,
   vimWorkspaceVerified: true,
   solved: true,
